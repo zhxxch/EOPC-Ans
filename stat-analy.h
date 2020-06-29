@@ -2,12 +2,10 @@
 /*  __ |  \   /   __|
       /     /    |   
     ___|  _/ _\ \___|  */
-const double Avogadro = 6.022140857e23;
-const double Boltzmanm = 1.38064852e-23;
 typedef const double Avogadro;
 typedef const double Boltzmanm;
-Avogadro N_A = 6.022140857e23;
-Boltzmanm k_B = 1.38064852e-23;
+Avogadro N_A = 6.02214076e23;
+Boltzmanm k_B = 1.380649e-23;
 #include <math.h>
 inline double ks_cdf(const double MaxDiffXsqrtN, const int Num)
 {
