@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "stat-synth.h"
+#include "small-world-json.h"
 typedef int invalid_id_t;
 int HasNode(const int EdgesA[], const int EdgesB[],
 	const int NumEdges, const int nodeID) {
@@ -87,23 +88,21 @@ double Metric(const int EdgesA[], const int EdgesB[],
 	*metric_pass_node = pass_node;
 	return min_metric;
 }
+int AddRadiusLEdge(int EdgesA[], int EdgesB[],
+	const int NumEdges, const int nodeID,
+	const double radious, const int maxEdgesZ) {
+	return 0;
+}
 int main(int ac, char *av[]) {
 	const int MaxEdges = 10000;
 	int *EdgesA = calloc(sizeof(int), MaxEdges);
 	int *EdgesB = calloc(sizeof(int), MaxEdges);
 	int NumEdges = 0;
-	for(int i = 1; i < 20; i++) {
+	for(int i = 0; i < 20; i++) {
 		NumEdges
 			= AddNode(EdgesA, EdgesB, NumEdges, i);
 	}
-	const int Sphere1Edge = NumEdges;
-	for(int i = 0; i < 30; i++) {
-		const int edgeID = GetNodesIter(
-			EdgesA, EdgesB, NumEdges, i, 30);
-		if(edgeID < NumEdges) {
-			printf("Node at edge %i-%i\n",
-				EdgesA[edgeID], EdgesB[edgeID]);
-		}
-	}
+	const int Sphere1EdgesNum = NumEdges;
+	print_graph_js(stdout, EdgesA,EdgesB,20,Sphere1EdgesNum);
 	return 0;
 }
