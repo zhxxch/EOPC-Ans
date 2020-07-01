@@ -1,28 +1,73 @@
 <!doctype html>
+<meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css">
 <style>
-	#graph-container {
-		width: 600px;
-		height: 600px;
-		margin: 2em auto;
+	body {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.charts {
+		width: 400px;
+		height: 400px;
+		margin: 2em;
 	}
 </style>
-<div id="graph-container" class="shadow"></div>
+<div id="graph-container" class="charts shadow"></div>
+<div id="metrics-histogram" class="charts shadow"></div>
+<div id="p-chart" class="charts shadow"></div>
 </div>
 <script src="https://cdn.staticfile.org/echarts/4.8.0/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-stat@1.1.1/dist/ecStat.min.js"></script>
 <script src="small-world-graph.js"></script>
 <script>
-	var MyGraph = echarts.init(document.getElementById('graph-container'));
-	const option = {
+
+	const GraphOption = {
 		series: {
 			type: 'graph',
 			layout: 'circular',
-			animation: false,
 			lineStyle: { color: "#000000", opacity: 1 },
 			data: nodes,
 			edges: edges
 		},
+		animation: false,
 		color: "#000000",
 	};
-	MyGraph.setOption(option);
+	var VGraph = echarts.init(document.getElementById('graph-container'));
+	VGraph.setOption(GraphOption);
+	var VMHbins = ecStat.histogram(metrics);
+	const MHistogramOption = {
+		title: { text: "距离直方图" },
+		xAxis: [{
+			type: 'value',
+			scale: true,
+		}],
+		yAxis: [{
+			type: 'value',
+		}],
+		series: {
+			type: 'bar',
+			barWidth: "95%",
+			data: VMHbins.data
+		},
+		animation: false,
+		color: "#000000",
+	};
+	var VMetricsHistogram = echarts.init(document.getElementById('metrics-histogram'));
+	VMetricsHistogram.setOption(MHistogramOption);
+	const LPChartOption = {
+		title: { text: "l(p)" },
+		xAxis: {},
+		yAxis: {},
+		animation: false,
+		color: "#000000",
+		series: {
+			type: "scatter",
+			symbolSize: 5,
+			data: l_w_p
+		}
+	};
+	var LPChart = echarts.init(document.getElementById('p-chart'));
+	LPChart.setOption(LPChartOption);
 </script>
