@@ -8,7 +8,7 @@ random-matrix.exe: random-matrix.cpp
 	cl random-matrix.cpp $(CFLAGS) /Fe:random-matrix.exe
 
 small-world.exe: small-world.cpp small-world-json.h
-	cl small-world.cpp $(CFLAGS) /Fe:small-world.exe
+	cl small-world.cpp $(CFLAGS) /Zi /Fe:small-world.exe
 
 mepc.wasm: kpsolver.c uwraptype.c genhlist.c
 	clang --target=wasm32 -nostdlib -O2 -Xlinker --no-entry -Xlinker --export-all -Xlinker --import-memory -o mepc.wasm kpsolver.c uwraptype.c genhlist.c

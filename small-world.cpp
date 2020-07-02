@@ -91,6 +91,7 @@ int PrintLPRelation(const int L, const int Z,
 		cout << "[" << (p_n*L*Z/2) << "," << (avg_l*Z*3.14159265359f/L) << "],";
 	}
 	cout << "];\n";
+	return 0;
 }
 int main(int ac, char *av[]) {
 	if(ac < 4) return -1;
@@ -104,6 +105,6 @@ int main(int ac, char *av[]) {
 	print_graph_js(stdout, small_world0, L);
 	print_metrics_js(stdout, metric0);
 	double avg_l0 = AvgMetrics(metric0);
-	PrintLPRelation(L,Z,0.001f,1.0f,10,20);
+	PrintLPRelation(L,Z,0.001f,1.0f,20,20);
 	return 0;
 }
