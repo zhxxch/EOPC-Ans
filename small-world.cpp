@@ -73,35 +73,37 @@ double AvgMetrics(const MatrixXf metrics) {
 	return metrics.array().mean()
 		* ((L * L) / (L * L - L));
 }
+int PrintLPRelation(const int L, const int Z,
+	const float p0, const float p1,
+	const int num_iter, const int num_sample) {
+	cout << "var l_w_p = [\n";
+	for(float p_n = p0; p_n < p1;
+		p_n += (p1 - p0) / num_sample) {
+		double avg_l = 0;
+#pragma omp parallel for num_threads(2) reduction(+ : avg_l)
+		for(int i = 0; i < num_iter; i++) {
+			const MatrixXf small_world
+				= GenSmallWorld(L, Z, p_n);
+			const MatrixXf Metric
+				= GraphMetrics(small_world);
+			avg_l += AvgMetrics(Metric) / num_iter;
+		}
+		cout << "[" << (p_n*L*Z/2) << "," << (avg_l*Z*3.14159265359f/L) << "],";
+	}
+	cout << "];\n";
+}
 int main(int ac, char *av[]) {
 	if(ac < 4) return -1;
 	const int L = stoi(av[1]);
 	const int Z = stoi(av[2]);
 	const float p = stof(av[3]);
 	const MatrixXf small_world0
-		= GenSmallWorld(L, Z, 0);
+		= GenSmallWorld(L, Z, p);
 	const MatrixXf metric0
 		= GraphMetrics(small_world0);
 	print_graph_js(stdout, small_world0, L);
 	print_metrics_js(stdout, metric0);
 	double avg_l0 = AvgMetrics(metric0);
-	
-	const int NumIter = 50;
-	cout << "var l_w_p = [\n";
-	for(float p_n = 0.001f; p_n < 0.2; p_n += p) {
-		double avg_l = 0;
-#pragma omp parallel for num_threads(2) reduction(+ : avg_l)
-		for(int i = 0; i < NumIter; i++) {
-			const MatrixXf small_world
-				= GenSmallWorld(L, Z, p_n);
-			const MatrixXf Metric
-				= GraphMetrics(small_world);
-			avg_l += AvgMetrics(Metric) / NumIter;
-		}
-		cout << "[" << p_n << "," << avg_l
-			 << "],";
-	}
-	cout << "];\n";
-	
+	PrintLPRelation(L,Z,0.001f,1.0f,10,20);
 	return 0;
 }
