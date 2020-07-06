@@ -1,4 +1,4 @@
-Target=random-matrix.exe small-world.exe
+Target=random-matrix.exe small-world.exe self-avoid-walk.exe
 
 All: $(Target)
 
@@ -9,6 +9,9 @@ random-matrix.exe: random-matrix.cpp
 
 small-world.exe: small-world.cpp
 	cl small-world.cpp $(CFLAGS) /Zi /Fe:small-world.exe
+
+self-avoid-walk.exe: self-avoid-walk.cpp
+	cl self-avoid-walk.cpp $(CFLAGS) /Fe:self-avoid-walk.exe
 
 mepc.wasm: kpsolver.c uwraptype.c genhlist.c
 	clang --target=wasm32 -nostdlib -O2 -Xlinker --no-entry -Xlinker --export-all -Xlinker --import-memory -o mepc.wasm kpsolver.c uwraptype.c genhlist.c
