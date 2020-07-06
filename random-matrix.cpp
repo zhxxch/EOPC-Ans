@@ -4,7 +4,6 @@
 #include <string>
 #include "Eigen/Dense"
 #include "stat-synth.h"
-#include"small-world-json.h"
 using namespace Eigen;
 
 double eigenvalue_split(const int N) {

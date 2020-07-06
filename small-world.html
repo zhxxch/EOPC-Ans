@@ -18,13 +18,14 @@
 <div id="graph-container" class="charts shadow"></div>
 <div id="metrics-histogram" class="charts shadow"></div>
 <div id="p-chart" class="charts shadow"></div>
+<div id="betweenness_chart" class="charts shadow"></div>
 </div>
 <script src="https://cdn.staticfile.org/echarts/4.8.0/echarts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts-stat@1.1.1/dist/ecStat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-stat@1.1.0/dist/ecStat.min.js"></script>
 <script src="small-world-graph.js"></script>
 <script>
-
 	const GraphOption = {
+		title:{text:"L="+SmallWorld.L+"; Z="+SmallWorld.Z+"; p="+SmallWorld.p},
 		series: {
 			type: 'graph',
 			layout: 'circular',
@@ -39,7 +40,7 @@
 	VGraph.setOption(GraphOption);
 	var VMHbins = ecStat.histogram(metrics);
 	const MHistogramOption = {
-		title: { text: "距离直方图" },
+		title: { text: "距离直方图（Metrics）" },
 		xAxis: [{
 			type: 'value',
 			scale: true,
@@ -57,18 +58,44 @@
 	};
 	var VMetricsHistogram = echarts.init(document.getElementById('metrics-histogram'));
 	VMetricsHistogram.setOption(MHistogramOption);
-	const LPChartOption = {
-		title: { text: "l(p)" },
-		xAxis: {},
-		yAxis: {},
-		animation: false,
-		color: "#000000",
-		series: {
-			type: "scatter",
-			symbolSize: 5,
-			data: l_w_p
-		}
-	};
-	var LPChart = echarts.init(document.getElementById('p-chart'));
-	LPChart.setOption(LPChartOption);
+	var p_chart_el = document.getElementById('p-chart');
+	if (typeof l_w_p == "undefined") { p_chart_el.style.display = "none"; } else {
+		const LPChartOption = {
+			title: { text: "l(p)" },
+			xAxis: {},
+			yAxis: {},
+			animation: false,
+			color: "#000000",
+			series: {
+				type: "scatter",
+				symbolSize: 5,
+				data: l_w_p
+			}
+		};
+		var LPChart = echarts.init(p_chart_el);
+		LPChart.setOption(LPChartOption);
+	}
+	var betweenness_el = document.getElementById('betweenness_chart');
+	if (typeof betweenness == "undefined") { betweenness_el.style.display = "none"; } else {
+		var VBHbins = ecStat.histogram(betweenness);
+		const BHistogramOption = {
+			title: { text: "节点流量直方图（Betweenness）" },
+			xAxis: [{
+				type: 'value',
+				scale: true,
+			}],
+			yAxis: [{
+				type: 'value',
+			}],
+			series: {
+				type: 'bar',
+				barWidth: "95%",
+				data: VBHbins.data
+			},
+			animation: false,
+			color: "#000000",
+		};
+		var VBHistogram = echarts.init(betweenness_el);
+		VBHistogram.setOption(BHistogramOption);
+	}
 </script>
