@@ -1,7 +1,4 @@
-*.xlsx
-*.pdf
 *.pdb
-*.otf
 *.ll
 # Object files
 *.o
