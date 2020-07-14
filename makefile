@@ -10,8 +10,8 @@ random-matrix.exe: $*.cpp
 small-world.exe: $*.cpp
 	cl $*.cpp $(CFLAGS) /Zi /Fe:$@
 
-self-avoid-walk.exe: self-avoid-walk.cpp
-	cl self-avoid-walk.cpp $(CFLAGS) /Fe:$@
+self-avoid-walk.exe: $*.cpp
+	cl $*.cpp $(CFLAGS) /Fe:$@
 
 speck-perf.exe: $*.cpp
 	cl $*.cpp $(CFLAGS) /Fe:$@ /FAs
@@ -21,7 +21,5 @@ mepc.wasm: kpsolver.c uwraptype.c genhlist.c
 
 clean:
 	del *.obj
-
-cleanall:
-	del *.obj
 	del *.exe
+	del *.pdb

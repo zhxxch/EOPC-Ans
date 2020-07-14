@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include "Eigen/Dense"
+#include "speck.h"
 #include "stat-synth.h"
 using namespace Eigen;
 
@@ -39,7 +40,7 @@ double eigenvalue_split_01(const int N) {
 		N, N, [=](const Index row, const Index col) {
 			const uint64_t u01 = speck64u96(row,
 				(const uint32_t)col, KeyHi, KeyLo);
-				return (u01&1)?1:-1;
+			return (u01 & 1) ? 1 : -1;
 		});
 	const MatrixXd SymNormal
 		= AsymNormal + AsymNormal.transpose();
@@ -57,8 +58,8 @@ int main(int ac, char *av[]) {
 	std::ios::sync_with_stdio(false);
 	const int N = std::stoi(av[1]);
 	const int M = std::stoi(av[2]);
-	VectorXd Splits = VectorXd::NullaryExpr(
-		M, [=](void) { return eigenvalue_split_01(N); });
+	VectorXd Splits = VectorXd::NullaryExpr(M,
+		[=](void) { return eigenvalue_split_01(N); });
 	IOFormat CsvFormat(
 		StreamPrecision, DontAlignCols, "", "\n");
 	std::cout << "Eigenvalues" << std::endl

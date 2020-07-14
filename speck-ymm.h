@@ -4,6 +4,7 @@
  *  ___|  _/ _\ \___|  */
 #include <immintrin.h>
 #include <stdint.h>
+#include <stdio.h>
 #ifndef _speck128u128_round
 #define _speck128u128_round 32
 #endif
@@ -16,16 +17,16 @@ inline void speckw128u128iter(__m256i counter,
 		= _mm256_loadu_si256((const __m256i *)PtHi);
 	CtLo = _mm256_xor_si256(counter, CtLo);
 	for(int i = 0; i < _speck128u128_round; i += 4) {
-		CtHi = _mm256_or_si256(
-			_mm256_srli_epi64(CtHi, 8),
-			_mm256_slli_epi64(CtHi, 56));
-		CtHi = _mm256_add_epi64(CtHi, CtLo);
+		__m256i CtHiR = _mm256_srli_epi64(CtHi, 8);
+		__m256i CtHiL = _mm256_slli_epi64(CtHi, 56);
+		CtHiR = _mm256_add_epi64(CtHiR, CtLo);
+		CtHi = _mm256_add_epi64(CtHiR, CtHiL);
 		CtHi = _mm256_xor_si256(CtHi,
 			_mm256_loadu_si256(
 				(const __m256i *)(Keys + i)));
-		CtLo = _mm256_or_si256(
-			_mm256_srli_epi64(CtLo, 61),
-			_mm256_slli_epi64(CtLo, 3));
+		__m256i CtLoR = _mm256_srli_epi64(CtLo, 61);
+		__m256i CtLoL = _mm256_slli_epi64(CtLo, 3);
+		CtLo = _mm256_xor_si256(CtLoR, CtLoL);
 		CtLo = _mm256_xor_si256(CtLo, CtHi);
 	}
 	CtLo = _mm256_permute4x64_epi64(CtLo, 0x93);
@@ -111,9 +112,10 @@ inline void speckw128key32(uint64_t RoundKeys[32],
 #ifdef __cplusplus
 #include <array>
 auto Speck128RNG(uint64_t KeyLo, uint64_t KeyHi) {
-	std::array<uint64_t, 4> CtLo, CtHi;
+	std::array<uint64_t, 4> alignas(32) CtLo;
+	std::array<uint64_t, 4> alignas(32) CtHi;
 	__m256i Counter = _mm256_set1_epi32(0);
-	std::array<uint64_t, 32> RoundKeys;
+	std::array<uint64_t, 32> alignas(32) RoundKeys;
 	speckw128key32(RoundKeys.data(), KeyLo, KeyHi);
 	for(int i = 0; i < 4; i++) {
 		Counter = _mm256_add_epi64(
@@ -124,10 +126,10 @@ auto Speck128RNG(uint64_t KeyLo, uint64_t KeyHi) {
 	return
 		[CtLo, CtHi, Counter, RoundKeys](
 			void) mutable -> std::array<uint64_t, 2> {
-			Counter = _mm256_add_epi64(Counter,
-				_mm256_set_epi64x(1, 0, 0, 0));
 			speckw128u128iter(Counter, CtLo.data(),
 				CtHi.data(), RoundKeys.data());
+			Counter = _mm256_add_epi64(Counter,
+				_mm256_set_epi64x(1, 0, 0, 0));
 			return std::array<uint64_t, 2>{
 				CtLo[0], CtHi[0]};
 		};

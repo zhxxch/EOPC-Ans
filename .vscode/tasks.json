@@ -6,7 +6,7 @@
 		{
 			"label": "make",
 			"type": "shell",
-			"command": "cmd.exe /C call '\"C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build/vcvars64.bat\"' '&' nmake",
+			"command": "import-vs;nmake",
 			"problemMatcher": ["$msCompile"],
 			"group": {
 				"kind": "build",
@@ -16,7 +16,7 @@
 		{
 			"label": "make all",
 			"type": "shell",
-			"command": "cmd.exe /C call '\"C:/Program Files (x86)/Microsoft Visual Studio/2019/BuildTools/VC/Auxiliary/Build/vcvars64.bat\"' '&' nmake /all",
+			"command": "import-vs;nmake /all",
 			"problemMatcher": ["$msCompile"],
 			"group": "build"
 		}

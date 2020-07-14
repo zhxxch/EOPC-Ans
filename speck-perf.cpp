@@ -2,26 +2,41 @@
 #include <chrono>
 #include <vector>
 #include <cstdint>
+#include "iacaMarks.h"
 #include "speck-ymm.h"
+#include "speck.h"
 #include "stat-synth.h"
+
 using hires_clock = std::chrono::high_resolution_clock;
 int main(void) {
-	const int N = 1024 * 1024 * 20;
-	const int Size = N * sizeof(uint64_t);
+	const int N = 1024 * 1024 * 10;
+	const long long Size = N * sizeof(uint64_t);
 	const double MB = Size / 1000000.0;
 	const double MiB = Size / (1024.0 * 1024.0);
 	const double Gb = (Size * 8) / 1000000000.0;
-	std::array<uint64_t, 4> CtLo, CtHi;
+	std::array<uint64_t, 4> CtLo = {0}, CtHi = {0};
 	std::array<uint64_t, 32> RoundKeys;
-	speckw128key32(RoundKeys.data(), 123432, 9087897);
+	speckw128key32(RoundKeys.data(),
+		0x0706050403020100ull, 0x0f0e0d0c0b0a0908ull);
+	CtLo[0] = 0x7469206564616d20ull;
+	CtHi[0] = 0x6c61766975716520ull;
+	__m256i c0 = _mm256_setzero_si256();
+	for(int i = 0; i < 4; i++) {
+		speckw128u128iter(c0, CtLo.data(), CtHi.data(),
+			RoundKeys.data());
+	}
+	auto old_std_flag = std::cout.flags();
+	std::cout << std::hex << CtHi[0] << ";" << CtLo[0]
+			  << old_std_flag << std::endl;
 	std::vector<uint64_t> Vec(N);
-	auto speck_rng = Speck128RNG(123432, 9087897);
+	auto speck_rng = Speck128RNG(
+		0x0f0e0d0c0b0a0908ull, 0x0706050403020100ull);
 	hires_clock::time_point t0 = hires_clock::now();
 #if 1
 	for(int i = 0; i < N; i += 2) {
 		auto v = speck_rng();
 		Vec[i] = v[0];
-		Vec[i+1] = v[1];
+		Vec[i + 1] = v[1];
 	}
 #endif
 #if 0
