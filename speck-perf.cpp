@@ -6,10 +6,9 @@
 #include "speck-ymm.h"
 #include "speck.h"
 #include "stat-synth.h"
-
 using hires_clock = std::chrono::high_resolution_clock;
 int main(void) {
-	const int N = 1024 * 1024 * 10;
+	const long long N = 1024 * 1024 * 10;
 	const long long Size = N * sizeof(uint64_t);
 	const double MB = Size / 1000000.0;
 	const double MiB = Size / (1024.0 * 1024.0);
@@ -25,6 +24,10 @@ int main(void) {
 		speckw128u128iter(c0, CtLo.data(), CtHi.data(),
 			RoundKeys.data());
 	}
+	CtLo[0] = 0x7469206564616d20ull;
+	CtHi[0] = 0x6c61766975716520ull;
+	speck128u128(CtLo.data(), CtHi.data(),
+		0x0706050403020100ull, 0x0f0e0d0c0b0a0908ull);
 	auto old_std_flag = std::cout.flags();
 	std::cout << std::hex << CtHi[0] << ";" << CtLo[0]
 			  << old_std_flag << std::endl;
@@ -33,6 +36,20 @@ int main(void) {
 		0x0f0e0d0c0b0a0908ull, 0x0706050403020100ull);
 	hires_clock::time_point t0 = hires_clock::now();
 #if 1
+	for(unsigned long long i = 0; i < N; i += 2) {
+		IACA_VC64_START
+		speck128u128(&Vec[i], &Vec[i + 1], i, i);
+	}
+	IACA_VC64_END
+#endif
+#if 0
+	for(long long i = 0; i < N; i++) {
+		IACA_VC64_START
+		Vec[i] = speck64u96(i, 0xa, 0xb, 0xc);
+	}
+	IACA_VC64_END
+#endif
+#if 0
 	for(int i = 0; i < N; i += 2) {
 		auto v = speck_rng();
 		Vec[i] = v[0];
